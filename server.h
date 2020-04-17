@@ -3,6 +3,7 @@
 
 #include <QTcpServer>
 #include <QNetworkInterface>
+#include <QList>
 #include <iostream>
 #include "servermessagehandler.h"
 #include "tcpconvenience.h"
@@ -17,6 +18,7 @@ public:
     void run();
     void shutdown();
     void incomingConnection(qintptr handle) override;
+    QList<QString> clients();
 
 public slots:
     void addClients();

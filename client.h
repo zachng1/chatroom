@@ -16,8 +16,12 @@ public slots:
     void receive();
     void sendMessage(QString message);
     void error(QAbstractSocket::SocketError error);
+    void shutdown();
 signals:
     void receivedmsg(QString message);
+    void disconnected();
+    void connected();
+    void errInvalid();
 
 private:
     QTcpSocket * socket;

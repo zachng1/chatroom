@@ -13,13 +13,15 @@ class ChatWindow : public QVBoxLayout
     Q_OBJECT
 public:
     ChatWindow(QWidget * parent=nullptr);
-    void enable();
-    void disable();
 signals:
     void sendMessage(const QString);
 public slots:
+    void enable();
+    void disable();
     void receiveMessage(const QString message);
+    void ownMessage(const QString message);
     void messageConnector();
+    void clear();
 
 private:
     QTextEdit * chats;

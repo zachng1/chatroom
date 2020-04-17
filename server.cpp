@@ -40,17 +40,16 @@ void Server::addClients() {
         //cast works because we overrode incomingConnection
 
 
-        //SORRY!!!
+        //SORRY!!! but it only needs to do this once, on connect!
         connect(newclient, &QAbstractSocket::readyRead, this,
-                [&, newclient]()
-        {this->setName(newclient);
-        disconnect(newclient, nullptr, this, nullptr);}
-        );
-
+                [&, newclient]() {
+        this->setName(newclient);
         handler->addClient(newclient);
         std::cout << "New connection from "
                   << newclient->peerAddress().toString().toStdString()
                   << std::endl;
+        disconnect(newclient, nullptr, this, nullptr);
+        });
     }
 }
 
@@ -80,8 +79,6 @@ void Server::consoleLog() {
 void Server::setName(TcpConvenience *newconnection) {
     QByteArray name = newconnection->readAll();
     QString QSName = QString::fromStdString(name.toStdString());
-    QString test;
-    test = QSName;
 
     newconnection->setName(QSName);
     connect(newconnection, &QIODevice::readyRead,

@@ -17,6 +17,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     setCentralWidget(widget);
     connect(client, &Client::receivedmsg, chat, &ChatWindow::receiveMessage);
     connect(chat, &ChatWindow::sendMessage, client, &Client::sendMessage);
+    connect(client, &Client::connected, chat, &ChatWindow::enable);
+    connect(client, &Client::connected, chat, &ChatWindow::clear);
+    connect(client, &Client::connected, this, [&](){
+        joinAct->setEnabled(false);
+        disconnectAct->setEnabled(true);});
+    connect(client, &Client::disconnected, chat, &ChatWindow::disable);
+    connect(client, &Client::disconnected, this, [&](){
+        joinAct->setEnabled(true);
+        disconnectAct->setEnabled(false);
+    });
+
+    connect(client, &Client::errInvalid, this, &MainWindow::invalidChar);
+}
+
+//needs added checking for if either object is in fact running
+void MainWindow::closeEvent(QCloseEvent *event) {
+    server->shutdown();
+    client->shutdown();
+    event->accept();
 }
 
 void MainWindow::setupMenu() {
@@ -32,12 +51,12 @@ void MainWindow::setupMenu() {
 
     connect(hostAct, &QAction::triggered, this, &MainWindow::host);
     connect(closeAct, &QAction::triggered, this, &MainWindow::closeServer);
+    connect(clientsAct, &QAction::triggered, this, &MainWindow::viewClients);
 
     QMenu * client = menu->addMenu("&Client");
     joinAct = client->addAction("&Join a Server");
-    client->addAction("&Disconnect")->setEnabled(false);
-    client->addSeparator();
-    client->addAction("&Set Name");
+    disconnectAct = client->addAction("&Disconnect");
+    disconnectAct->setEnabled(false);
 
     connect(joinAct, &QAction::triggered, this, &MainWindow::join);
 }
@@ -77,6 +96,10 @@ void MainWindow::closeServer() {
     clientsAct->setEnabled(false);
 }
 
+void MainWindow::viewClients() {
+    return;
+}
+
 void MainWindow::join() {
     if(joindialog->exec()) {
         QString port = joindialog->port();
@@ -102,7 +125,18 @@ void MainWindow::join() {
             return;
         }
         QString name = joindialog->username();
+        if (name.contains(':') || name.contains('@') || name.contains('!')) {
+            error->showMessage("Name cannot contain ':', '@', '!'");
+            return;
+        }
+        else if (name.isEmpty()) {
+            error->showMessage("Name cannot be empty");
+            return;
+        }
         client->connectHost(name, ipaddress, portnum);
-        chat->enable();
     }
+}
+
+void MainWindow::invalidChar() {
+    error->showMessage("Invalid character");
 }

@@ -15,23 +15,53 @@ ChatWindow::ChatWindow(QWidget * parent) : QVBoxLayout(parent),
     connect(send, &QPushButton::pressed,
             this, &ChatWindow::messageConnector);
 
+
+    chats->setFontFamily("Cambria");
+    chats->setFontItalic(true);
     chats->setReadOnly(true);
-    chats->setAlignment(Qt::AlignRight);
 
     this->addWidget(chats);
     this->addItem(sendedit);
 }
 
 void ChatWindow::receiveMessage(const QString message) {
-    chats->append(message);
+    if (message.startsWith('@')) {
+        chats->setTextColor(Qt::black);
+        chats->setAlignment(Qt::AlignCenter);
+        chats->append(message.mid(1, message.length()) + "\n");
+        return;
+    }
+    else if (message.startsWith('!')) {
+        chats->setTextColor(Qt::black);
+        chats->setAlignment(Qt::AlignCenter);
+        chats->append(message.mid(1, message.length()) + "\n");
+        return;
+    }
+
+    chats->setTextColor(Qt::black);
+    chats->setAlignment(Qt::AlignLeft);
+    int splitat = message.indexOf(':') + 1;
+    chats->append(message.left(splitat));
+    chats->moveCursor(QTextCursor::End);
+    chats->setTextColor(Qt::gray);
+    chats->insertPlainText(message.right(message.length()-splitat) + '\n');
+}
+
+void ChatWindow::ownMessage(const QString message) {
+    chats->setTextColor(Qt::black);
+    chats->setAlignment(Qt::AlignRight);
+    chats->append(message + "\n");
 }
 
 void ChatWindow::messageConnector() {
     QString msg = editor->text();
     emit sendMessage(msg);
-
-    receiveMessage(msg);
+    ownMessage(msg);
     editor->setText("");
+}
+
+void ChatWindow::clear() {
+    chats->clear();
 }
 
 void ChatWindow::disable() {

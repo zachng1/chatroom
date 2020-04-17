@@ -6,14 +6,22 @@ ServerMessageHandler::ServerMessageHandler() : QObject(),
 }
 
 void ServerMessageHandler::addClient(TcpConvenience *newclient) {
+    for (auto &i: *clients) {
+        i->write(("@" + newclient->name() +" connected.").toStdString().c_str());
+    }
     clients->push_back(newclient);
 }
 
 void ServerMessageHandler::broadcast(TcpConvenience *sender) {
     QByteArray data = sender->readAll();
-    if (data.length() == 0) {
+    if (data.contains('\x1b')) {
+        QString name = sender->name();
         removeClient(sender);
-        std::cout << "Removed a client" << std::endl;
+        for (auto &i: *clients) {
+            i->write(("!" + name + " disconnected.").toStdString().c_str());
+        }
+        std::cout << "Disconnected" + name.toStdString() << std::endl;
+        return;
     }
     for (auto &i: *clients) {
         if (i == sender) continue;

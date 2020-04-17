@@ -6,6 +6,7 @@
 #include <QMenuBar>
 #include <QErrorMessage>
 #include <QMessageBox>
+#include <QCloseEvent>
 #include <cerrno>
 #include <string>
 #include <iostream>
@@ -21,16 +22,17 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget * parent = nullptr);
+    void closeEvent(QCloseEvent * event) override;
 
 public slots:
     void host();
     void closeServer();
-//    void viewClients();
+    void viewClients();
 
     void join();
 //    void disconnect();
-//    void changeName();
+    void invalidChar();
 
 
 private:
@@ -47,6 +49,7 @@ private:
     QAction * clientsAct;
 
     QAction * joinAct;
+    QAction * disconnectAct;
 
     ChatWindow * chat;
 
