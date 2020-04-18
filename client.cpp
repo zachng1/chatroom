@@ -12,11 +12,11 @@ Client::Client() : socket{new QTcpSocket}
 
 void Client::connectHost(QString name, QHostAddress address, quint16 port) {
     socket->connectToHost(address, port);
-
-    //need to fix this
-    connect(socket, &QTcpSocket::connected, this, [&, name](){
+    QMetaObject::Connection * const connection = new QMetaObject::Connection;
+    *connection = connect(socket, &QTcpSocket::connected, this, [&, name, connection](){
         this->socket->write(name.toStdString().c_str());
         emit connected();
+        disconnect(*connection);
     });
 }
 

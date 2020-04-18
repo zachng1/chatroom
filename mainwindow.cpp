@@ -45,13 +45,9 @@ void MainWindow::setupMenu() {
     hostAct = server->addAction("&Host");
     closeAct = server->addAction("&Close Server");
     closeAct->setEnabled(false);
-    server->addSeparator();
-    clientsAct = server->addAction("&Clients");
-    clientsAct->setEnabled(false);
 
     connect(hostAct, &QAction::triggered, this, &MainWindow::host);
     connect(closeAct, &QAction::triggered, this, &MainWindow::closeServer);
-    connect(clientsAct, &QAction::triggered, this, &MainWindow::viewClients);
 
     QMenu * client = menu->addMenu("&Client");
     joinAct = client->addAction("&Join a Server");
@@ -59,6 +55,7 @@ void MainWindow::setupMenu() {
     disconnectAct->setEnabled(false);
 
     connect(joinAct, &QAction::triggered, this, &MainWindow::join);
+    connect(disconnectAct, &QAction::triggered, this, &MainWindow::disconnectClient);
 }
 
 void MainWindow::host() {
@@ -81,7 +78,6 @@ void MainWindow::host() {
         server->run();
         hostAct->setEnabled(false);
         closeAct->setEnabled(true);
-        clientsAct->setEnabled(true);
     }
 }
 
@@ -93,11 +89,6 @@ void MainWindow::closeServer() {
     }
     hostAct->setEnabled(true);
     closeAct->setEnabled(false);
-    clientsAct->setEnabled(false);
-}
-
-void MainWindow::viewClients() {
-    return;
 }
 
 void MainWindow::join() {
@@ -135,6 +126,10 @@ void MainWindow::join() {
         }
         client->connectHost(name, ipaddress, portnum);
     }
+}
+
+void MainWindow::disconnectClient() {
+    client->shutdown();
 }
 
 void MainWindow::invalidChar() {

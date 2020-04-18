@@ -28,10 +28,10 @@ public:
 public slots:
     void host();
     void closeServer();
-    void viewClients();
+//    void viewClients();
 
     void join();
-//    void disconnect();
+    void disconnectClient();
     void invalidChar();
 
 

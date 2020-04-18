@@ -25,7 +25,7 @@ void ServerMessageHandler::broadcast(TcpConvenience *sender) {
     }
     for (auto &i: *clients) {
         if (i == sender) continue;
-        i->write(i->name().toStdString().c_str());
+        i->write(sender->name().toStdString().c_str());
         i->write(": ");
         if(i->write(data) < data.length()) {
             std::cout << "error at " << i->peerAddress().toString().toStdString() << std::endl;
